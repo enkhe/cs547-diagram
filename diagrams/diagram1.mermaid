@@ -1,0 +1,34 @@
+flowchart LR
+    subgraph Client
+        U[Client / curl]
+    end
+
+    subgraph Serverful["Serverful Architecture"]
+        direction LR
+        FA[FastAPI + Uvicorn]
+        MW[Security Middleware<br/>Rate Limit · Headers · Request-ID]
+        PY[Pydantic Validation]
+        ORM[SQLAlchemy ORM]
+        PG[(PostgreSQL 15<br/>Docker)]
+        FA --> MW --> PY --> ORM --> PG
+    end
+
+    subgraph Serverless["Serverless Architecture"]
+        direction LR
+        AG[API Gateway<br/>REST /{proxy+}]
+        LM[Lambda Function<br/>Python 3.10]
+        IV[Input Validation<br/>+ API Key Check]
+        DB1[(DynamoDB<br/>Products<br/>read-only)]
+        DB2[(DynamoDB<br/>Cart<br/>CRUD)]
+        DB3[(DynamoDB<br/>Orders<br/>write+query)]
+        AG --> LM --> IV
+        IV --> DB1
+        IV --> DB2
+        IV --> DB3
+    end
+
+    U -- "HTTPS + X-API-Key" --> FA
+    U -- "HTTPS + x-api-key" --> AG
+
+    style Serverful fill:#e8f4fd,stroke:#2196F3
+    style Serverless fill:#fff3e0,stroke:#FF9800
